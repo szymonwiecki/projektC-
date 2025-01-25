@@ -70,17 +70,26 @@ builder.Services.AddSwaggerGen(options =>
     options.EnableAnnotations();
 });
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyMethod()
+              .AllowAnyHeader();
+    });
+});
+
+
 var app = builder.Build();
+
+app.UseCors("AllowAll"); // Dodaj tê liniê
+
 
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI(options =>
-    {
-        options.SwaggerEndpoint("/swagger/v1/swagger.json", "Library API v1");
-        options.InjectStylesheet("/swagger-custom.css"); // Dodanie niestandardowego CSS
-        options.InjectJavascript("/swagger-custom.js"); // Dodanie niestandardowego JavaScript
-    });
+    app.UseSwaggerUI();
 }
 
 // Dodanie danych testowych

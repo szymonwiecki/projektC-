@@ -26,10 +26,12 @@ namespace LibraryApi.Controllers
         {
             try
             {
-                return Ok(_context.Books.ToList());
+                var books = _context.Books.ToList();
+                return Ok(books);
             }
             catch (Exception ex)
             {
+                // Logujemy b³¹d (w rzeczywistoœci u¿yj np. logowania do pliku lub systemu logowania)
                 return StatusCode(500, new { message = "An error occurred while fetching books", details = ex.Message });
             }
         }
@@ -40,12 +42,19 @@ namespace LibraryApi.Controllers
         [SwaggerOperation(Summary = "Show selected book", Description = "This endpoint allows will show you selected (by id) book.")]
         public ActionResult<Book> GetBook(int id)
         {
-            var book = _context.Books.Find(id);
+            try
+            {
+                var book = _context.Books.Find(id);
+                if (book == null)
+                    return NotFound(new { message = "Book not found" });
 
-            if (book == null)
-                return NotFound(new { message = "Book not found" });
-
-            return Ok(book);
+                return Ok(book);
+            }
+            catch (Exception ex)
+            {
+                // Logowanie b³êdu
+                return StatusCode(500, new { message = "An error occurred while fetching the book", details = ex.Message });
+            }
         }
         // Dodanie nowej ksi¹¿ki
         [Authorize]
@@ -53,6 +62,11 @@ namespace LibraryApi.Controllers
         [SwaggerOperation(Summary = "Add a new book", Description = "This endpoint allows you to add a new book to the library.")]
         public ActionResult<Book> CreateBook(Book book)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState); // Zwracamy komunikat o b³êdzie, jeœli model nie jest poprawny
+            }
+
             try
             {
                 _context.Books.Add(book);
@@ -61,6 +75,7 @@ namespace LibraryApi.Controllers
             }
             catch (Exception ex)
             {
+                // Logowanie b³êdu
                 return StatusCode(500, new { message = "An error occurred while creating the book", details = ex.Message });
             }
         }
@@ -71,20 +86,37 @@ namespace LibraryApi.Controllers
         [SwaggerOperation(Summary = "Chenge existing book", Description = "This endpoint allows you change data in existing book.")]
         public ActionResult UpdateBook(int id, Book book)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState); // Zwracamy komunikat o b³êdzie, jeœli model nie jest poprawny
+            }
+
             if (id != book.Id)
+            {
                 return BadRequest(new { message = "ID in URL and body must match" });
+            }
 
-            var existingBook = _context.Books.Find(id);
-            if (existingBook == null)
-                return NotFound(new { message = "Book not found" });
+            try
+            {
+                var existingBook = _context.Books.Find(id);
+                if (existingBook == null)
+                {
+                    return NotFound(new { message = "Book not found" });
+                }
 
-            existingBook.Title = book.Title;
-            existingBook.Author = book.Author;
-            existingBook.PublishedYear = book.PublishedYear;
-            existingBook.Genre = book.Genre;
+                existingBook.Title = book.Title;
+                existingBook.Author = book.Author;
+                existingBook.PublishedYear = book.PublishedYear;
+                existingBook.Genre = book.Genre;
 
-            _context.SaveChanges();
-            return NoContent();
+                _context.SaveChanges();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                // Logowanie b³êdu
+                return StatusCode(500, new { message = "An error occurred while updating the book", details = ex.Message });
+            }
         }
 
         // Usuniêcie ksi¹¿ki
@@ -93,13 +125,21 @@ namespace LibraryApi.Controllers
         [SwaggerOperation(Summary = "Remove a book", Description = "This endpoint allows you to remove a book from library.")]
         public ActionResult DeleteBook(int id)
         {
-            var book = _context.Books.Find(id);
-            if (book == null)
-                return NotFound(new { message = "Book not found" });
+            try
+            {
+                var book = _context.Books.Find(id);
+                if (book == null)
+                    return NotFound(new { message = "Book not found" });
 
-            _context.Books.Remove(book);
-            _context.SaveChanges();
-            return NoContent();
+                _context.Books.Remove(book);
+                _context.SaveChanges();
+                return NoContent();
+            }
+            catch (Exception ex)
+            {
+                // Logowanie b³êdu
+                return StatusCode(500, new { message = "An error occurred while deleting the book", details = ex.Message });
+            }
         }
 
     }

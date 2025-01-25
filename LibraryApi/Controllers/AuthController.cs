@@ -5,6 +5,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Swashbuckle.AspNetCore.Annotations;
+using LibraryApi.Models;
 
 namespace LibraryApi.Controllers
 {
@@ -21,13 +22,12 @@ namespace LibraryApi.Controllers
 
         [HttpPost("login")]
         [SwaggerOperation(Summary = "Authorization", Description = "This endpoint handles user authorization.")]
-        public ActionResult Login(string username, string password)
+        public ActionResult Login([FromBody] LoginRequest loginRequest)
         {
-            // Prosty przykład walidacji (w rzeczywistości użyj bazy danych)
-            if (username != "admin" || password != "password")
+            if (loginRequest.Username != "admin" || loginRequest.Password != "admin")
                 return Unauthorized(new { message = "Invalid credentials" });
 
-            var token = GenerateJwtToken(username);
+            var token = GenerateJwtToken(loginRequest.Username);
             return Ok(new { token });
         }
 
