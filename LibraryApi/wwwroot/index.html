@@ -34,14 +34,14 @@
         <!-- CRUD -->
         <section id="crud-section">
             <h1>CRUD Operations</h1>
-            
+
             <!-- Get Books -->
             <details>
                 <summary>Get Books</summary>
                 <button id="get-books-btn">Fetch Books</button>
                 <ul id="books-list"></ul>
             </details>
-            
+
             <!-- Get Book by ID -->
             <details>
                 <summary>Get Book by ID</summary>
@@ -56,25 +56,23 @@
             <details>
                 <summary>Add Book</summary>
                 <form id="add-book-form">
-                    <label for="add-id">ID:</label>
-                    <input type="number" id="add-id" placeholder="ID" required>
-            
+
                     <label for="add-title">Title:</label>
                     <input type="text" id="add-title" placeholder="Title" required>
-            
+
                     <label for="add-author">Author:</label>
                     <input type="text" id="add-author" placeholder="Author" required>
-            
+
                     <label for="add-year">Published Year:</label>
                     <input type="number" id="add-year" placeholder="Year" required>
-            
+
                     <label for="add-genre">Genre:</label>
                     <input type="text" id="add-genre" placeholder="Genre" required>
-            
+
                     <button type="submit">Add Book</button>
                 </form>
                 <div id="add-book-message"></div>
-            </details>            
+            </details>
 
             <!-- Edit Book -->
             <details>
@@ -82,19 +80,19 @@
                 <form id="edit-book-form">
                     <label for="edit-id">ID of the book to edit:</label>
                     <input type="number" id="edit-id" placeholder="ID" required>
-                    
+
                     <label for="edit-title">Title:</label>
                     <input type="text" id="edit-title" placeholder="Title" required>
-                    
+
                     <label for="edit-author">Author:</label>
                     <input type="text" id="edit-author" placeholder="Author" required>
-                    
+
                     <label for="edit-year">Published Year:</label>
                     <input type="number" id="edit-year" placeholder="Year" required>
-                    
+
                     <label for="edit-genre">Genre:</label>
                     <input type="text" id="edit-genre" placeholder="Genre" required>
-                    
+
                     <button type="submit">Edit Book</button>
                 </form>
                 <div id="edit-book-message"></div>
@@ -108,6 +106,22 @@
                     <button type="submit">Delete Book</button>
                 </form>
                 <div id="delete-book-message"></div>
+            </details>
+
+            <!-- Export Books to CSV -->
+            <details>
+                <summary>Export Books (Download CSV)</summary>
+                <button id="export-csv-btn">Download CSV</button>
+            </details>
+
+            <!-- Import Books from CSV -->
+            <details>
+                <summary>Import Books (Upload CSV)</summary>
+                <form id="import-csv-form" enctype="multipart/form-data">
+                    <input type="file" id="import-csv-file" accept=".csv" required>
+                    <button type="submit">Upload CSV</button>
+                </form>
+                <div id="import-csv-message"></div>
             </details>
         </section>
     </div>

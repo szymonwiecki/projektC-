@@ -119,7 +119,6 @@ document.addEventListener("DOMContentLoaded", () => {
         event.preventDefault();
     
         // Pobieramy dane z formularza
-        const id = document.getElementById("add-id").value;
         const title = document.getElementById("add-title").value;
         const author = document.getElementById("add-author").value;
         const year = document.getElementById("add-year").value;
@@ -135,7 +134,6 @@ document.addEventListener("DOMContentLoaded", () => {
                     "Content-Type": "application/json"
                 },
                 body: JSON.stringify({
-                    id: parseInt(id), // Przesyłamy pełny obiekt książki
                     title: title,
                     author: author,
                     publishedYear: parseInt(year), // Konwertujemy rok na liczbę
@@ -234,5 +232,46 @@ document.addEventListener("DOMContentLoaded", () => {
         } catch (err) {
             deleteBookMessage.textContent = "Error while deleting book.";
         }
+    });
+
+    // Pobieranie CSV
+    document.getElementById('export-csv-btn').addEventListener('click', () => {
+        fetch('https://localhost:7106/api/Books/export', {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+            }
+        })
+            .then(response => response.blob())
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'books_export.csv';
+                a.click();
+            })
+            .catch(err => alert("Export failed: " + err));
+    });
+
+    // Wysyłanie CSV
+    document.getElementById('import-csv-form').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const fileInput = document.getElementById('import-csv-file');
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        fetch('https://localhost:7106/api/Books/import', {
+            method: 'POST',
+            headers: {
+                "Authorization": `Bearer ${token}`,
+            },
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('import-csv-message').textContent = `${data.count} books imported successfully`;
+            })
+            .catch(error => {
+                document.getElementById('import-csv-message').textContent = 'Import failed';
+            });
     });
 });

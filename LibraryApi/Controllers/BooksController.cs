@@ -2,7 +2,9 @@ using LibraryApi.Data;
 using LibraryApi.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Text;
 
 
 namespace LibraryApi.Controllers
@@ -60,25 +62,34 @@ namespace LibraryApi.Controllers
         [Authorize]
         [HttpPost]
         [SwaggerOperation(Summary = "Add a new book", Description = "This endpoint allows you to add a new book to the library.")]
-        public ActionResult<Book> CreateBook(Book book)
+        public ActionResult<Book> CreateBook(AddBook newBook)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState); // Zwracamy komunikat o b³êdzie, jeœli model nie jest poprawny
+                return BadRequest(ModelState);
             }
 
             try
             {
+                var book = new Book
+                {
+                    Title = newBook.Title,
+                    Author = newBook.Author,
+                    PublishedYear = newBook.PublishedYear,
+                    Genre = newBook.Genre
+                };
+
                 _context.Books.Add(book);
                 _context.SaveChanges();
+
                 return CreatedAtAction(nameof(GetBook), new { id = book.Id }, book);
             }
             catch (Exception ex)
             {
-                // Logowanie b³êdu
                 return StatusCode(500, new { message = "An error occurred while creating the book", details = ex.Message });
             }
         }
+
 
         // Aktualizacja istniej¹cej ksi¹¿ki
         [Authorize]
@@ -141,6 +152,73 @@ namespace LibraryApi.Controllers
                 return StatusCode(500, new { message = "An error occurred while deleting the book", details = ex.Message });
             }
         }
+
+        [Authorize]
+        [HttpGet("export")]
+        public async Task<IActionResult> ExportBooks()
+        {
+            var books = await _context.Books.ToListAsync();
+
+            var csv = new StringBuilder();
+            csv.AppendLine("Id,Title,Author,PublishedYear,Genre");
+
+            foreach (var book in books)
+            {
+                csv.AppendLine($"{book.Id},{book.Title},{book.Author},{book.PublishedYear},{book.Genre}");
+            }
+
+            var bytes = Encoding.UTF8.GetBytes(csv.ToString());
+            return File(bytes, "text/csv", "books_export.csv");
+        }
+
+        [Authorize]    
+        [HttpPost("import")]
+        public async Task<IActionResult> ImportBooks(IFormFile file)
+        {
+            if (file == null || file.Length == 0)
+                return BadRequest("No file uploaded");
+
+            var importedBooks = new List<Book>();
+
+            using (var reader = new StreamReader(file.OpenReadStream()))
+            {
+                string? headerLine = await reader.ReadLineAsync(); // Skip header
+                if (headerLine == null || !headerLine.StartsWith("Title"))
+                    return BadRequest("Invalid file format. Header must start with 'Title'");
+
+                while (!reader.EndOfStream)
+                {
+                    var line = await reader.ReadLineAsync();
+                    if (string.IsNullOrWhiteSpace(line)) continue;
+
+                    var parts = line.Split(',');
+                    if (parts.Length != 4) continue;
+
+                    try
+                    {
+                        var book = new Book
+                        {
+                            Title = parts[0],
+                            Author = parts[1],
+                            PublishedYear = int.Parse(parts[2]),
+                            Genre = parts[3]
+                        };
+                        importedBooks.Add(book);
+                    }
+                    catch
+                    {
+                        // loguj b³êdne linie
+                        continue;
+                    }
+                }
+            }
+
+            _context.Books.AddRange(importedBooks);
+            await _context.SaveChangesAsync();
+
+            return Ok(new { count = importedBooks.Count, message = "Books imported successfully" });
+        }
+
 
     }
 

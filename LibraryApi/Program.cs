@@ -32,8 +32,9 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 
 // Dodaj konfiguracjê bazy danych
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 builder.Services.AddDbContext<LibraryContext>(options =>
-    options.UseInMemoryDatabase("LibraryDb"));
+    options.UseSqlServer(connectionString));
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
@@ -96,11 +97,16 @@ if (app.Environment.IsDevelopment())
 using (var scope = app.Services.CreateScope())
 {
     var context = scope.ServiceProvider.GetRequiredService<LibraryContext>();
-    context.Books.AddRange(
-        new Book { Title = "wtdolnosc 2.0", Author = "ben greenfield", PublishedYear = 2020, Genre = "biology" },
-        new Book { Title = "biohacking", Author = "karol wyszomirski", PublishedYear = 2021, Genre = "motivation" }
-    );
-    context.SaveChanges();
+    context.Database.EnsureCreated();
+
+    if (!context.Books.Any())
+    {
+        context.Books.AddRange(
+            new Book { Title = "wtdolnosc 2.0", Author = "ben greenfield", PublishedYear = 2020, Genre = "biology" },
+            new Book { Title = "biohacking", Author = "karol wyszomirski", PublishedYear = 2021, Genre = "motivation" }
+        );
+        context.SaveChanges();
+    }
 }
 
 app.UseAuthentication();
