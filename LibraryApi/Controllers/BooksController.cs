@@ -69,6 +69,20 @@ namespace LibraryApi.Controllers
                 return BadRequest(ModelState);
             }
 
+            var existingBook = _context.Books
+                .FirstOrDefault(b => b.Title.ToLower() == newBook.Title.ToLower()
+                                && b.Author.ToLower() == newBook.Author.ToLower());
+
+            if (existingBook != null)
+            {
+                return Conflict(new
+                {
+                    message = "Book already exists",
+                    existingBookId = existingBook.Id,
+                    details = "A book with the same title and author already exists in the database"
+                });
+            }
+
             try
             {
                 var book = new Book
@@ -113,6 +127,22 @@ namespace LibraryApi.Controllers
                 if (existingBook == null)
                 {
                     return NotFound(new { message = "Book not found" });
+                }
+
+                // Sprawdzenie czy nowe dane nie koliduj¹ z inn¹ ksi¹¿k¹
+                var duplicateBook = _context.Books
+                    .FirstOrDefault(b => b.Id != id
+                                     && b.Title.ToLower() == book.Title.ToLower()
+                                     && b.Author.ToLower() == book.Author.ToLower());
+
+                if (duplicateBook != null)
+                {
+                    return Conflict(new
+                    {
+                        message = "Update would create duplicate book",
+                        existingBookId = duplicateBook.Id,
+                        details = "Another book with the same title and author already exists"
+                    });
                 }
 
                 existingBook.Title = book.Title;

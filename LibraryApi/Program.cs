@@ -11,7 +11,7 @@ using Swashbuckle.AspNetCore.SwaggerGen;
 var builder = WebApplication.CreateBuilder(args);
 
 // Dodaj klucz JWT
-var key = Encoding.UTF8.GetBytes("YourSecretKey12345"); // Zamieñ na silny klucz!
+var key = Encoding.UTF8.GetBytes("YourSecretKey12345"); 
 
 builder.Services.AddAuthentication(options =>
 {
@@ -96,18 +96,48 @@ if (app.Environment.IsDevelopment())
 // Dodanie danych testowych
 using (var scope = app.Services.CreateScope())
 {
-    var context = scope.ServiceProvider.GetRequiredService<LibraryContext>();
-    context.Database.EnsureCreated();
-
-    if (!context.Books.Any())
+    var db = scope.ServiceProvider.GetRequiredService<LibraryContext>();
+    try
     {
-        context.Books.AddRange(
-            new Book { Title = "wtdolnosc 2.0", Author = "ben greenfield", PublishedYear = 2020, Genre = "biology" },
-            new Book { Title = "biohacking", Author = "karol wyszomirski", PublishedYear = 2021, Genre = "motivation" }
+        // SprawdŸ, czy baza danych istnieje
+        if (db.Database.CanConnect())
+        {
+            // Jeœli baza istnieje, zastosuj tylko brakuj¹ce migracje
+            if (db.Database.GetPendingMigrations().Any())
+            {
+                db.Database.Migrate();
+                Console.WriteLine("Zastosowano brakuj¹ce migracje.");
+            }
+            else
+            {
+                Console.WriteLine("Baza danych jest aktualna - nie trzeba stosowaæ migracji.");
+            }
+        }
+        else
+        {
+            // Jeœli baza nie istnieje, utwórz j¹ z migracjami
+            db.Database.Migrate();
+            Console.WriteLine("Utworzono now¹ bazê danych z migracjami.");
+        }
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"B³¹d podczas migracji bazy danych: {ex.Message}");
+        // Mo¿esz tutaj dodaæ dodatkowe logowanie b³êdów
+    }
+
+    // SEEDING – tylko jeœli tabela Books jest pusta
+    if (!db.Books.Any())
+    {
+        db.Books.AddRange(
+            new Book { Title = "1984", Author = "George Orwell", PublishedYear = 1949, Genre = "Dystopia" },
+            new Book { Title = "Hobbit", Author = "J.R.R. Tolkien", PublishedYear = 1937, Genre = "Fantasy" },
+            new Book { Title = "Nowy wspania³y œwiat", Author = "Aldous Huxley", PublishedYear = 1932, Genre = "Science Fiction" }
         );
-        context.SaveChanges();
+        db.SaveChanges();
     }
 }
+
 
 app.UseAuthentication();
 
