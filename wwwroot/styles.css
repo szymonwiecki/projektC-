@@ -1,0 +1,91 @@
+/* styles.css */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+    color: #333;
+    line-height: 1.6;
+}
+
+#app {
+    width: 60%;
+    margin: 20px auto;
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+    margin-bottom: 20px;
+}
+
+form, details {
+    margin-bottom: 20px;
+}
+
+input, button {
+    display: block;
+    width: 98%;
+    padding: 10px;
+    margin: 10px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    background-color: #007BFF;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+details {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 10px;
+    background: #fafafa;
+}
+
+details summary {
+    font-weight: bold;
+    cursor: pointer;
+}
+
+#books-list {
+    margin-top: 10px;
+    list-style: none;
+    padding: 0;
+}
+
+#login-message {
+    width: 98%;
+    height: 100px;
+    margin-top: 10px;
+    resize: vertical; /* Pozwala użytkownikowi zmieniać rozmiar pola w pionie */
+    overflow: auto; /* Dodaje scroll w przypadku bardzo długiego tekstu */
+    white-space: pre-wrap; /* Zachowuje łamanie wierszy jak w notatniku */
+    word-wrap: break-word; /* Zawijanie tekstu w razie potrzeby */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    font-family: monospace; /* Ustawia czcionkę jak w edytorze kodu */
+    font-size: 14px;
+}
+
+#get-book-result {
+    margin-top: 10px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    word-wrap: break-word; /* Zawijanie tekstu */
+}
