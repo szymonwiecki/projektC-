@@ -12,7 +12,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const password = document.getElementById("password").value;
 
         try {
-            const response = await fetch("https://localhost:7106/api/Auth/login", {
+            const response = await fetch("http://localhost:7106/api/Auth/login", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ username, password })
@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     getBooksBtn.addEventListener("click", async () => {
         try {
-            const response = await fetch("https://localhost:7106/api/Books", {
+            const response = await fetch("http://localhost:7106/api/Books", {
                 method: "GET",
                 headers: { 
                     "Authorization": `Bearer ${token}`,
@@ -79,7 +79,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const resultDiv = document.getElementById("get-book-result");
     
         try {
-            const response = await fetch(`https://localhost:7106/api/Books/${bookId}`, {
+            const response = await fetch(`http://localhost:7106/api/Books/${bookId}`, {
                 method: "GET",
                 headers: {
                     "Authorization": `Bearer ${token}`,
@@ -127,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const messageDiv = document.getElementById("add-book-message");
     
             // Wysyłamy żądanie POST do backendu
-            const response = await fetch("https://localhost:7106/api/Books", {
+            const response = await fetch("http://localhost:7106/api/Books", {
                 method: "POST",
                 headers: {
                     "Authorization": `Bearer ${token}`,
@@ -175,7 +175,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const messageDiv = document.getElementById("edit-book-message");
     
             // Wysyłamy żądanie PUT do backendu
-            const response = await fetch(`https://localhost:7106/api/Books/${id}`, {
+            const response = await fetch(`http://localhost:7106/api/Books/${id}`, {
                 method: "PUT",
                 headers: {
                     "Authorization": `Bearer ${token}`,
@@ -217,7 +217,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const id = parseInt(document.getElementById("delete-id").value, 10);
 
         try {
-            const response = await fetch(`https://localhost:7106/api/Books/${id}`, {
+            const response = await fetch(`http://localhost:7106/api/Books/${id}`, {
                 method: "DELETE",
                 headers: {
                     "Authorization": `Bearer ${token}`,
@@ -236,7 +236,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // Pobieranie CSV
     document.getElementById('export-csv-btn').addEventListener('click', () => {
-        fetch('https://localhost:7106/api/Books/export', {
+        fetch('http://localhost:7106/api/Books/export', {
             headers: {
                 "Authorization": `Bearer ${token}`,
             }
@@ -259,7 +259,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const formData = new FormData();
         formData.append('file', fileInput.files[0]);
 
-        fetch('https://localhost:7106/api/Books/import', {
+        fetch('http://localhost:7106/api/Books/import', {
             method: 'POST',
             headers: {
                 "Authorization": `Bearer ${token}`,
